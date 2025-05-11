@@ -61,32 +61,27 @@ jobs:
           image_name: ${{ matrix.image_name }}
           version: ${{ github.event.inputs.version }}
 
-#  create-release:
-#    needs: [validate-inputs, build-image]
-#    runs-on: ubuntu-latest
-#    steps:
-#      - name: Checkout code
-#        uses: actions/checkout@v4
-#
-#      - name: Download all artifacts
-#        uses: actions/download-artifact@v4
-#        with:
-#          path: artifacts
-#
-#      - name: Create release tag
-#        run: |
-#          git config --local user.email "github-actions@github.com"
-#          git config --local user.name "GitHub Actions"
-#          git tag -a v${{ github.event.inputs.version }} -m "Release v${{ github.event.inputs.version }}"
-#          git push origin v${{ github.event.inputs.version }}
-#
-#      - name: Create GitHub Release
-#        id: create_release
-#        uses: softprops/action-gh-release@v2
-#        with:
-#          tag_name: v${{ github.event.inputs.version }}
-#          name: Release v${{ github.event.inputs.version }}
-#          draft: false
-#          prerelease: false
-#          generate_release_notes: true
-#          files: artifacts/**/*
+  create-release:
+    needs: [validate-inputs, build-image]
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Download all artifacts
+        uses: actions/download-artifact@v4
+        with:
+          path: artifacts
+
+      - name: Create GitHub Release
+        id: create_release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: v${{ github.event.inputs.version }}
+          name: Release v${{ github.event.inputs.version }}
+          draft: false
+          prerelease: false
+          generate_release_notes: true
+          files: artifacts/**/*
