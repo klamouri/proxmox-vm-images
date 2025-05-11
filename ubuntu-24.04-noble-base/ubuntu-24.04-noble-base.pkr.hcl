@@ -11,18 +11,6 @@ packer {
   }
 }
 
-variable "qemu_accelerator" {
-  type        = string
-  default     = ""
-  description = "Qemu accelerator to use. On Linux use kvm and macOS use hvf."
-}
-
-variable "ubuntu_version" {
-  type        = string
-  default     = "noble"
-  description = "Ubuntu codename version (i.e. 20.04 is focal and 22.04 is jammy)"
-}
-
 source "qemu" "ubuntu" {
   accelerator      = var.qemu_accelerator
   cd_files = ["./cloud-init/*"]
@@ -33,11 +21,11 @@ source "qemu" "ubuntu" {
   headless         = true
   iso_checksum     = "file:https://cloud-images.ubuntu.com/${var.ubuntu_version}/current/SHA256SUMS"
   iso_url          = "https://cloud-images.ubuntu.com/${var.ubuntu_version}/current/${var.ubuntu_version}-server-cloudimg-amd64.img"
-  output_directory = "output-${var.ubuntu_version}"
+  output_directory = "${var.build_directory}"
   shutdown_command = "echo 'packer' | sudo -S shutdown -P now"
   ssh_password     = "ubuntu"
   ssh_username     = "ubuntu"
-  vm_name          = "ubuntu-${var.ubuntu_version}.img"
+  vm_name          = "${var.image_name}"
   qemuargs = [
     ["-m", "2048M"],
     ["-smp", "2"],

@@ -1,0 +1,52 @@
+name: Build VM Image
+inputs:
+  image_name:
+    required: true
+    type: string
+    description: 'Directory name of the image to build'
+  version:
+    required: true
+    type: string
+    description: 'Version tag for the image'
+
+runs:
+  using: "composite"
+  steps:
+    - name: Install QEMU
+      shell: bash
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y qemu-system-x86 xorriso
+
+    - name: Set up Packer
+      uses: hashicorp/setup-packer@main
+      with:
+        version: "1.9.4"
+
+    - name: Set up Ansible
+      shell: bash
+      run: |
+        sudo apt-get install -y ansible
+
+    - name: Build VM image
+      shell: bash
+      run: |
+        cd ${{ inputs.image_name }}
+        packer init .
+        packer validate .
+        # Here would would add the parameter `-var qemu_accelerator=kvm` if Github Actions hosted runners supported KVM
+        packer build \
+          -var build_directory=../build/${{ inputs.image_name }} \
+          -var image_name=${{ inputs.image_name }}.v${{ inputs.version }}.img \
+          .
+
+    - name: List generated images
+      shell: bash
+      run: |
+        find build/${{ inputs.image_name }}/* -type f -name "*.img"
+
+    - name: Upload image as artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: ${{ inputs.image_name }}.v${{ inputs.version }}
+        path: build/${{ inputs.image_name }}/${{ inputs.image_name }}.v${{ inputs.version }}.img
