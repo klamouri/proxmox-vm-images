@@ -65,6 +65,7 @@ jobs:
     needs: [validate-inputs, build-image]
     runs-on: ubuntu-latest
     permissions:
+      id-token: write
       contents: write
     steps:
       - name: Checkout code
