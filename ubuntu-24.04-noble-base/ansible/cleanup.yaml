@@ -1,0 +1,97 @@
+---
+- name: Cleanup system before image packaging
+  hosts: all
+  become: yes
+  tasks:
+
+    - name: Remove SSH authorized_keys for ubuntu
+      file:
+        path: /home/ubuntu/.ssh/authorized_keys
+        state: absent
+
+    - name: Remove SSH authorized_keys for root
+      file:
+        path: /root/.ssh/authorized_keys
+        state: absent
+
+    - name: Truncate machine-id
+      copy:
+        content: ''
+        dest: /etc/machine-id
+        force: true
+
+    - name: Remove contents of /tmp
+      file:
+        path: /tmp
+        state: directory
+        mode: '1777'
+        recurse: yes
+
+    - name: Remove contents of /var/tmp
+      file:
+        path: /var/tmp
+        state: directory
+        mode: '1777'
+        recurse: yes
+
+    - name: Find all regular files in /var/log
+      find:
+        paths: /var/log
+        file_type: file
+      register: log_files
+
+    - name: Truncate all log files
+      copy:
+        content: ''
+        dest: "{{ item.path }}"
+      loop: "{{ log_files.files }}"
+
+    - name: Remove root user's bash history
+      file:
+        path: /root/.bash_history
+        state: absent
+
+    - name: Remove current user's bash history
+      file:
+        path: "{{ ansible_env.HOME }}/.bash_history"
+        state: absent
+
+    - name: Remove /usr/share/doc
+      file:
+        path: /usr/share/doc
+        state: absent
+
+    - name: Remove files in /var/cache
+      find:
+        paths: /var/cache
+        file_type: file
+      register: cache_files
+
+    - name: Delete files in /var/cache
+      file:
+        path: "{{ item.path }}"
+        state: absent
+      loop: "{{ cache_files.files }}"
+
+    - name: Autoremove unused packages
+      apt:
+        autoremove: yes
+
+    - name: Clean apt cache
+      apt:
+        clean: yes
+
+    - name: Remove apt lists
+      file:
+        path: /var/lib/apt/lists
+        state: absent
+
+    - name: Remove random seed to force regeneration
+      file:
+        path: /var/lib/systemd/random-seed
+        state: absent
+
+    - name: Remove wget history
+      file:
+        path: /root/.wget-hsts
+        state: absent
