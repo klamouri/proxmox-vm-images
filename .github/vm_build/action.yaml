@@ -1,12 +1,12 @@
 name: Build VM Image
+description: |
+  This action builds a VM image using Packer, QEMU and Ansible, and uploads the resulting image as an artifact.
 inputs:
   image_name:
     required: true
-    type: string
     description: 'Directory name of the image to build'
   version:
     required: true
-    type: string
     description: 'Version tag for the image'
 
 runs:
@@ -46,7 +46,13 @@ runs:
         find build/${{ inputs.image_name }}/* -type f -name "*.img"
 
     - name: Upload image as artifact
+      id: upload-image
       uses: actions/upload-artifact@v4
       with:
         name: ${{ inputs.image_name }}.v${{ inputs.version }}
         path: build/${{ inputs.image_name }}/${{ inputs.image_name }}.v${{ inputs.version }}.img
+
+    - uses: actions/attest-build-provenance@v2
+      with:
+        subject-name: ${{ inputs.image_name }}.v${{ inputs.version }}
+        subject-digest: sha256:${{ steps.upload-image.outputs.artifact-digest }}
