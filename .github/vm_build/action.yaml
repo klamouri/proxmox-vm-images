@@ -8,6 +8,12 @@ inputs:
   version:
     required: true
     description: 'Version tag for the image'
+  base_image:
+    required: false
+    description: 'Base image name for specialized builds (e.g., ubuntu-24.04-noble)'
+  base_artifacts_path:
+    required: false
+    description: 'Path to base image artifacts for specialized builds'
 
 runs:
   using: "composite"
@@ -27,6 +33,17 @@ runs:
       shell: bash
       run: |
         sudo apt-get install -y ansible
+
+    - name: Setup base image artifacts for specialized builds
+      shell: bash
+      if: inputs.base_image != '' && inputs.base_artifacts_path != ''
+      run: |
+        if [ -d "${{ inputs.base_artifacts_path }}" ]; then
+          mkdir -p build/base-images/${{ inputs.base_image }}
+          # Find and copy base image artifacts
+          find "${{ inputs.base_artifacts_path }}" -name "*.img" -exec cp {} build/base-images/${{ inputs.base_image }}/ \; 2>/dev/null || true
+          ls -la build/base-images/${{ inputs.base_image }}/ || true
+        fi
 
     - name: Build VM image
       shell: bash

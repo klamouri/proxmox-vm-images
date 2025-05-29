@@ -17,3 +17,7 @@ crash.log
 build
 .idea
 .vscode
+
+
+.ansible
+.DS_Store
