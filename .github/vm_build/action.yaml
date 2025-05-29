@@ -2,9 +2,12 @@ name: Build VM Image
 description: |
   This action builds a VM image using Packer, QEMU and Ansible, and uploads the resulting image as an artifact.
 inputs:
+  image_path:
+    required: true
+    description: 'Path to the image directory containing Packer templates'
   image_name:
     required: true
-    description: 'Directory name of the image to build'
+    description: 'Name of the image to build'
   version:
     required: true
     description: 'Version tag for the image'
@@ -48,26 +51,26 @@ runs:
     - name: Build VM image
       shell: bash
       run: |
-        cd ${{ inputs.image_name }}
+        cd ${{ inputs.image_path }}
         packer init .
         packer validate .
         # Here would would add the parameter `-var qemu_accelerator=kvm` if Github Actions hosted runners supported KVM
         packer build \
-          -var build_directory=../build/${{ inputs.image_name }} \
+          -var build_directory=../../build/${{ inputs.image_path }} \
           -var image_name=${{ inputs.image_name }}.v${{ inputs.version }}.img \
           .
 
     - name: List generated images
       shell: bash
       run: |
-        find build/${{ inputs.image_name }}/* -type f -name "*.img"
+        find build/${{ inputs.image_path }}/* -type f -name "*.img"
 
     - name: Upload image as artifact
       id: upload-image
       uses: actions/upload-artifact@v4
       with:
         name: ${{ inputs.image_name }}.v${{ inputs.version }}
-        path: build/${{ inputs.image_name }}/${{ inputs.image_name }}.v${{ inputs.version }}.img
+        path: build/${{ inputs.image_path }}/${{ inputs.image_name }}.v${{ inputs.version }}.img
 
     - uses: actions/attest-build-provenance@v2
       with:

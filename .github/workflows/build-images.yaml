@@ -74,10 +74,16 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
+      - name: Parse image name
+        id: parse-image
+        run: |
+          IMAGE_BASENAME=$(basename "${{ matrix.image_name }}")
+          echo "image_basename=$IMAGE_BASENAME" >> $GITHUB_OUTPUT
       - name: Build base image (${{ matrix.image_name }})
         uses: ./.github/vm_build
         with:
-          image_name: ${{ matrix.image_name }}
+          image_path: ${{ matrix.image_name }}
+          image_name: ${{ steps.parse-image.outputs.image_basename }}
           version: ${{ github.event.inputs.version }}
 
   build-specialized-images:
@@ -100,6 +106,7 @@ jobs:
           # Remove last component after last dash to get base image name
           BASE_IMAGE=$(echo "$IMAGE_BASENAME" | sed 's/-[^-]*$//')
           echo "base_image=$BASE_IMAGE" >> $GITHUB_OUTPUT
+          echo "image_basename=$IMAGE_BASENAME" >> $GITHUB_OUTPUT
           echo "Specialized image: $IMAGE_BASENAME"
           echo "Base image: $BASE_IMAGE"
       - name: Download base image artifacts
@@ -107,18 +114,20 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           path: base-artifacts
-          pattern: "*base*"
+          pattern: ${{ steps.parse-base.outputs.base_image }}.v*
+      # TODO: Download and get the base image path here and pass it to the vm_build action
+      # This might be able to use to download the image from S3 or somewhere else
       - name: Build specialized image (${{ matrix.image_name }})
         uses: ./.github/vm_build
         with:
-          image_name: ${{ matrix.image_name }}
+          image_path: ${{ matrix.image_name }}
+          image_name: ${{ steps.parse-base.outputs.image_basename }}
           version: ${{ github.event.inputs.version }}
           base_image: ${{ steps.parse-base.outputs.base_image }}
           base_artifacts_path: base-artifacts
 
   create-release:
-    needs: [validate-inputs, build-base-images, build-specialized-images]
-    if: always()
+    needs: [build-base-images, build-specialized-images]
     runs-on: ubuntu-latest
     permissions:
       contents: write
