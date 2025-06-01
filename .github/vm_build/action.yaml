@@ -55,10 +55,20 @@ runs:
         packer init .
         packer validate .
         # Here would would add the parameter `-var qemu_accelerator=kvm` if Github Actions hosted runners supported KVM
-        packer build \
-          -var build_directory=../../build/${{ inputs.image_path }} \
-          -var image_name=${{ inputs.image_name }}.v${{ inputs.version }}.img \
-          .
+        if [ -n "${{ inputs.base_image }}" ]; then
+          # Specialized image build with base image dependency
+          packer build \
+            -var build_directory=../../build/${{ inputs.image_path }} \
+            -var image_name=${{ inputs.image_name }}.v${{ inputs.version }}.img \
+            -var base_image_path=../../build/base-images/${{ inputs.base_image }}/${{ inputs.base_image }}.v${{ inputs.version }}.img \
+            .
+        else
+          # Base image build without base image dependency
+          packer build \
+            -var build_directory=../../build/${{ inputs.image_path }} \
+            -var image_name=${{ inputs.image_name }}.v${{ inputs.version }}.img \
+            .
+        fi
 
     - name: List generated images
       shell: bash
