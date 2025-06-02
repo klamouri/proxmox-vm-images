@@ -120,10 +120,11 @@ jobs:
         shell: bash
         run: |
           mkdir -p build/base-images/${{ steps.parse-base.outputs.base_image }}
-          # Find and copy base image artifacts
-          find "${{ steps.parse-base.outputs.base_image }}" -name "*.img" -exec cp {} build/base-images/${{ steps.parse-base.outputs.base_image }}/ \; 2>/dev/null || true
+          # Find and copy base image artifacts from downloaded artifacts
+          find base-artifacts/ -type f -name "*.img" -exec cp {} build/base-images/${{ steps.parse-base.outputs.base_image }}/ \;
           ls -la build/base-images/${{ steps.parse-base.outputs.base_image }}/ || true
-          echo "base_image_path=$(find "${{ steps.parse-base.outputs.base_image }}" -name "*.img" | sort -V | tail -n 1)" >> $GITHUB_OUTPUT
+          # Save the latest .img file path to GITHUB_OUTPUT
+          echo "base_image_path=$(find build/base-images/${{ steps.parse-base.outputs.base_image }} -type f -name '*.img' | sort -V | tail -n 1)" >> $GITHUB_OUTPUT
 
 
       - name: Build specialized image (${{ matrix.image_name }})
