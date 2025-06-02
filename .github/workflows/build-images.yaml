@@ -132,7 +132,6 @@ jobs:
           image_path: ${{ matrix.image_name }}
           image_name: ${{ steps.parse-base.outputs.image_basename }}
           version: ${{ github.event.inputs.version }}
-          base_image: ${{ steps.parse-base.outputs.base_image }}
           base_image_path: ${{ steps.setup-base-artifacts.outputs.base_image_path }}
 
   create-release:

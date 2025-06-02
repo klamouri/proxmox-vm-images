@@ -37,22 +37,23 @@ runs:
     - name: Build VM image
       shell: bash
       run: |
-        packer init ${{ inputs.image_path }}
-        packer validate ${{ inputs.image_path }}
+        cd  ${{ inputs.image_path }}
+        packer init .
+        packer validate .
         # Here would would add the parameter `-var qemu_accelerator=kvm` if Github Actions hosted runners supported KVM
         if [ -n "${{ inputs.base_image_path }}" ]; then
           # Specialized image build with base image dependency
           packer build \
             -var build_directory=../../build/${{ inputs.image_path }} \
             -var image_name=${{ inputs.image_name }}.v${{ inputs.version }}.img \
-            -var base_image_path=${{ inputs.base_image_path }} \
-            ${{ inputs.image_path }}
+            -var base_image_path=../../${{ inputs.base_image_path }} \
+            .
         else
           # Base image build without base image dependency
           packer build \
             -var build_directory=../../build/${{ inputs.image_path }} \
             -var image_name=${{ inputs.image_name }}.v${{ inputs.version }}.img \
-            ${{ inputs.image_path }}
+            .
         fi
 
     - name: List generated images
