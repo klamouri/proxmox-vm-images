@@ -66,8 +66,7 @@ build {
       "sudo apt-get autoremove -y",
       "sudo apt-get autoclean",
       "sudo rm -rf /tmp/*",
-      "sudo rm -rf /var/log/*",
-      "history -c"
+      "sudo rm -rf /var/log/*"
     ]
   }
 }

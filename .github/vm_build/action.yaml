@@ -11,12 +11,9 @@ inputs:
   version:
     required: true
     description: 'Version tag for the image'
-  base_image:
+  base_image_path:
     required: false
-    description: 'Base image name for specialized builds (e.g., ubuntu-24.04-noble)'
-  base_artifacts_path:
-    required: false
-    description: 'Path to base image artifacts for specialized builds'
+    description: 'Path to base image file for specialized builds'
 
 runs:
   using: "composite"
@@ -37,37 +34,25 @@ runs:
       run: |
         sudo apt-get install -y ansible
 
-    - name: Setup base image artifacts for specialized builds
-      shell: bash
-      if: inputs.base_image != '' && inputs.base_artifacts_path != ''
-      run: |
-        if [ -d "${{ inputs.base_artifacts_path }}" ]; then
-          mkdir -p build/base-images/${{ inputs.base_image }}
-          # Find and copy base image artifacts
-          find "${{ inputs.base_artifacts_path }}" -name "*.img" -exec cp {} build/base-images/${{ inputs.base_image }}/ \; 2>/dev/null || true
-          ls -la build/base-images/${{ inputs.base_image }}/ || true
-        fi
-
     - name: Build VM image
       shell: bash
       run: |
-        cd ${{ inputs.image_path }}
-        packer init .
-        packer validate .
+        packer init ${{ inputs.image_path }}
+        packer validate ${{ inputs.image_path }}
         # Here would would add the parameter `-var qemu_accelerator=kvm` if Github Actions hosted runners supported KVM
-        if [ -n "${{ inputs.base_image }}" ]; then
+        if [ -n "${{ inputs.base_image_path }}" ]; then
           # Specialized image build with base image dependency
           packer build \
             -var build_directory=../../build/${{ inputs.image_path }} \
             -var image_name=${{ inputs.image_name }}.v${{ inputs.version }}.img \
-            -var base_image_path=../../build/base-images/${{ inputs.base_image }}/${{ inputs.base_image }}.v${{ inputs.version }}.img \
-            .
+            -var base_image_path=${{ inputs.base_image_path }} \
+            ${{ inputs.image_path }}
         else
           # Base image build without base image dependency
           packer build \
             -var build_directory=../../build/${{ inputs.image_path }} \
             -var image_name=${{ inputs.image_name }}.v${{ inputs.version }}.img \
-            .
+            ${{ inputs.image_path }}
         fi
 
     - name: List generated images
