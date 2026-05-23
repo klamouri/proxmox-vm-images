@@ -57,7 +57,7 @@ build {
       "sudo apt-get autoclean",
       "sudo rm -rf /tmp/*",
       "sudo rm -rf /var/log/*",
-      "history -c"
+      "sudo rm -f /root/.bash_history /home/ubuntu/.bash_history"
     ]
   }
 }
