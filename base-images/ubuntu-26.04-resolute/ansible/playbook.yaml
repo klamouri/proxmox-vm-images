@@ -1,0 +1,14 @@
+---
+- name: 'Provision Image'
+  hosts: default
+  become: true
+
+  tasks:
+    - name: Install qemu-guest-agent with apt
+      ansible.builtin.apt:
+        name: 'qemu-guest-agent'
+        update_cache: yes
+    - name: Install nfs-common with apt
+      ansible.builtin.apt:
+        name: 'nfs-common'
+        update_cache: yes
