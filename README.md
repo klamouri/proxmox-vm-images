@@ -5,9 +5,11 @@ This repository contains Packer templates for building VM images that can be imp
 ## Available Images
 
 ### Base Images
-- [ubuntu-24.04-noble](./base-images/ubuntu-24.04-noble) - Ubuntu 24.04 (Noble Numbat) base image
+- [ubuntu-26.04-resolute](./base-images/ubuntu-26.04-resolute) - Ubuntu 26.04 LTS (Resolute Raccoon) base image
+- [ubuntu-24.04-noble](./base-images/ubuntu-24.04-noble) - Ubuntu 24.04 LTS (Noble Numbat) base image
 
 ### Specialized Images
+- [ubuntu-26.04-resolute-docker](./specialized-images/ubuntu-26.04-resolute-docker) - Ubuntu 26.04 with Docker pre-installed
 - [ubuntu-24.04-noble-docker](./specialized-images/ubuntu-24.04-noble-docker) - Ubuntu 24.04 with Docker pre-installed
 
 ## Prerequisites
@@ -42,8 +44,8 @@ You can manually trigger the build workflow from the GitHub Actions tab with the
 
 - **Version**: The release version number (e.g., 0.0.1)
 - **Image Name**: The specific image to build or "ALL" to build all available images
-  - For base images: `base-images/ubuntu-24.04-noble`
-  - For specialized images: `specialized-images/ubuntu-24.04-noble-docker`
+  - For base images: `base-images/ubuntu-24.04-noble` or `base-images/ubuntu-26.04-resolute`
+  - For specialized images: `specialized-images/ubuntu-24.04-noble-docker` or `specialized-images/ubuntu-26.04-resolute-docker`
   - To build all images: `ALL`
 
 The workflow will:

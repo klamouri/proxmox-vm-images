@@ -4,13 +4,17 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Build Commands
 ### Base Images
-- Build Ubuntu base image on macOS: `packer build -var qemu_accelerator=hvf base-images/ubuntu-24.04-noble/ubuntu-24.04-noble.pkr.hcl`
-- Build Ubuntu base image on Linux: `packer build -var qemu_accelerator=kvm base-images/ubuntu-24.04-noble/ubuntu-24.04-noble.pkr.hcl`
+- Build Ubuntu 26.04 base image on macOS: `packer build -var qemu_accelerator=hvf base-images/ubuntu-26.04-resolute/ubuntu-26.04-resolute.pkr.hcl`
+- Build Ubuntu 26.04 base image on Linux: `packer build -var qemu_accelerator=kvm base-images/ubuntu-26.04-resolute/ubuntu-26.04-resolute.pkr.hcl`
+- Build Ubuntu 24.04 base image on macOS: `packer build -var qemu_accelerator=hvf base-images/ubuntu-24.04-noble/ubuntu-24.04-noble.pkr.hcl`
+- Build Ubuntu 24.04 base image on Linux: `packer build -var qemu_accelerator=kvm base-images/ubuntu-24.04-noble/ubuntu-24.04-noble.pkr.hcl`
 - Specify different Ubuntu version: `packer build -var ubuntu_version=jammy base-images/ubuntu-24.04-noble/ubuntu-24.04-noble.pkr.hcl`
 
 ### Specialized Images
-- Build Docker image on macOS: `packer build -var qemu_accelerator=hvf specialized-images/ubuntu-24.04-noble-docker/ubuntu-24.04-noble-docker.pkr.hcl`
-- Build Docker image on Linux: `packer build -var qemu_accelerator=kvm specialized-images/ubuntu-24.04-noble-docker/ubuntu-24.04-noble-docker.pkr.hcl`
+- Build Ubuntu 26.04 Docker image on macOS: `packer build -var qemu_accelerator=hvf specialized-images/ubuntu-26.04-resolute-docker/ubuntu-26.04-resolute-docker.pkr.hcl`
+- Build Ubuntu 26.04 Docker image on Linux: `packer build -var qemu_accelerator=kvm specialized-images/ubuntu-26.04-resolute-docker/ubuntu-26.04-resolute-docker.pkr.hcl`
+- Build Ubuntu 24.04 Docker image on macOS: `packer build -var qemu_accelerator=hvf specialized-images/ubuntu-24.04-noble-docker/ubuntu-24.04-noble-docker.pkr.hcl`
+- Build Ubuntu 24.04 Docker image on Linux: `packer build -var qemu_accelerator=kvm specialized-images/ubuntu-24.04-noble-docker/ubuntu-24.04-noble-docker.pkr.hcl`
 
 ## Naming Conventions
 ### Base Images
